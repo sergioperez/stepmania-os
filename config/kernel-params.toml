@@ -1,0 +1,1 @@
+kargs = ["usbhid.kbpoll=1","usbhid.jspoll=1","usbhid.mousepoll=1", "cpufreq.default_governor=performance"]

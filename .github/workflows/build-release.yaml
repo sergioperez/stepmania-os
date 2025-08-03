@@ -1,0 +1,60 @@
+name: Build release ITGMania bootc image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate tag
+        id: tag
+        run: |
+          echo "tag=release-$(cat game_version)-${GITHUB_SHA::6}" >> ${GITHUB_OUTPUT}
+
+      - name: Build bootc container image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: os
+          tags: "latest ${{ steps.tag.outputs.tag }}"
+          labels: |
+            org.opencontainers.image.version="${{ steps.tag.outputs.tag }}"
+          containerfiles: |
+            ./Containerfile
+
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: latest ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/stepmania
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Test
+        run: |
+          echo "image: ${{ steps.build-image.outputs.image-with-tag }} image: ${{ steps.build-image.outputs.image }} tags: ${{ steps.build-image.outputs.tags }}"
+
+      - name: Build system image
+        id: bootc
+        uses: osbuild/bootc-image-builder-action@3dd308c8c20f887a53cddd66a37ee37f7deb38eb
+        with:
+          image: ${{ steps.push-to-quay.outputs.registry-path }}
+          types: |
+            anaconda-iso
+          config-file: ./config.toml
+          rootfs: btrfs
+
+      - name: Upload disk.iso artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: itgmania-disk-iso
+          path: ${{ steps.bootc.outputs.anaconda-iso-output-path }}

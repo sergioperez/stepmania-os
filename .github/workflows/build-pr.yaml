@@ -1,0 +1,45 @@
+name: Build testing container image
+
+on:
+  pull_request:
+    branches:
+      - beta
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate tag
+        id: tag
+        run: |
+          echo "tag=pr-${{ github.event.pull_request.number }}-${GITHUB_SHA::3}" >> ${GITHUB_OUTPUT}
+
+      - name: Build bootc container image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: os
+          tags: ${{ steps.tag.outputs.tag }}
+          labels: |
+            org.opencontainers.image.version="${{ steps.tag.outputs.tag }}"
+            quay.expires-after="24h"
+          containerfiles: |
+            ./Containerfile
+
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/stepmania
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Test
+        run: |
+          echo "image: ${{ steps.build-image.outputs.image-with-tag }} image: ${{ steps.build-image.outputs.image }} tags: ${{ steps.build-image.outputs.tags }}"
