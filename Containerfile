@@ -1,41 +1,48 @@
-FROM quay.io/fedora/fedora-bootc:42
+FROM quay.io/almalinuxorg/almalinux-bootc:10
 
-## Install ITGMania dependencies and base system package
+# Set kernel parameters
+COPY config/kernel-params.toml /usr/lib/bootc/kargs.d/00-kernel-params.toml
+
+# TEMP: Enable crb repo
+RUN sed -i '0,/^enabled=/s/^enabled=.*/enabled=1/' /etc/yum.repos.d/almalinux-crb.repo
+
+# Install ITGMania dependencies and base system package
+RUN dnf install --setopt=install_weak_deps=False -y epel-release
+
 RUN dnf install --setopt=install_weak_deps=False -y \
-	lightdm xterm xorg-x11-xinit-session unclutter-xfixes \ 
-	lightdm-autologin-greeter lightdm-gobject python3-gobject \
-	xorg-x11-drv-amdgpu xorg-x11-drv-intel xorg-x11-drv-qxl \
-	xorg-x11-drv-ati xorg-x11-server-Xorg xorg-x11-drv-amdgpu \
+	mesa-libGLU libglvnd libglvnd-glx \
+	libogg libvorbis gtk3 libusb1 \
 	mesa-dri-drivers mesa-vulkan-drivers \
+	xorg-x11-server-Xwayland \
 	cockpit cockpit-files cockpit-networkmanager \
 	cockpit-ostree cockpit-podman \
-	alsa-utils alsa-lib \
-	libusb1 gtk3 pulseaudio-libs \
-	libogg libvorbis  \
-	mesa-libGLU libglvnd libglvnd-glx
+	alsa-firmware alsa-utils alsa-lib \
+	sddm weston
 
 # Download and extract game
-RUN curl https://github.com/itgmania/itgmania/releases/download/v1.1.0/ITGmania-1.1.0-Linux.tar.gz \
+RUN curl https://github.com/itgmania/itgmania/releases/download/v1.1.0/ITGmania-1.1.0-Linux-no-songs.tar.gz \
 		-Lo /opt/game.tar.gz && \
 	mkdir /opt/game && \
 	mv /opt/game.tar.gz /opt/game && \
 	cd /opt/game && \
 	tar zxvf /opt/game/game.tar.gz && \
 	rm -rf /opt/game/game.tar.gz && \
-	mv /opt/game/ITGmania-1.1.0-Linux/itgmania /opt/game && \
-	rm -rf /opt/game/ITGmania-1.1.0-Linux
+	mv /opt/game/ITGmania-1.1.0-Linux-no-songs/itgmania /opt/game && \
+	rm -rf "/opt/game/ITGmania-*"
 
-# Set Lightdm configuration
+# Copy launch-game script
+COPY --chmod=555 scripts/launch_game.sh /opt/game/launch_game.sh
+
+# Copy sddm config and session
+COPY config/sddm.conf /etc/sddm.conf.d/sddm.conf
+COPY config/itg.desktop /usr/share/wayland-sessions/itg.desktop
+
+# Create user
 RUN useradd stepmania && \
-	chown -R stepmania /opt/game && \
-	systemctl enable lightdm cockpit cockpit.socket
-COPY config/lightdm.conf /etc/lightdm/lightdm.conf.d/0-autologin.conf 
-COPY config/kernel-params.toml /usr/lib/bootc/kargs.d/00-kernel-params.toml
+	chown -R stepmania /opt/game
 
-# Copy extra scripts
-COPY --chmod=555 scripts/xsession /home/stepmania/.xsession
-COPY --chmod=555 scripts/xsession /home/stepmania/.xinitrc
-COPY --chmod=555 scripts/set_vol.sh /usr/bin/set_vol.sh
+# Enable cockpit for network admin
+RUN systemctl enable cockpit cockpit.socket
 
 # Extra cockpit configuration
 COPY --chmod=644 config/cockpit-disallowed /etc/cockpit/disallowed-users

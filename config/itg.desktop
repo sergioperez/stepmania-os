@@ -1,0 +1,3 @@
+[Desktop Entry]
+Exec= /opt/game/launch_game.sh
+TryExec= /opt/game/launch_game.sh
