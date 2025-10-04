@@ -14,11 +14,12 @@ done
 # Keep the game open
 while [ true ]
 do
-	# Start game
-	echo "Starting ITGMania"
-	if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
-	  weston --backend drm --shell=kiosk --xwayland  -- /opt/game/itgmania/itgmania
-	fi
-	echo "Game stopped - Restarting"
+        # Start game
+        echo "Starting ITGMania"
+        if [ -z "$DISPLAY" ]; then
+		# If a different monitor is detected, set the game to its resolution
+		cage -s -- bash -c "/opt/game/check_new_screen.sh && /opt/game/outputs_to_main_res.sh && /opt/game/itgmania/itgmania"
+        fi
+        echo "Game stopped - Restarting"
+	sleep 2
 done
-

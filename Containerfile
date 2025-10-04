@@ -1,14 +1,35 @@
+# Build cage - Not available on repos
+FROM quay.io/almalinuxorg/almalinux:10 AS dependencies
+
+RUN dnf install --setopt=install_weak_deps=False -y epel-release
+RUN dnf install --setopt=install_weak_deps=False -y cmake wlroots-devel wayland-protocols-devel scdoc git meson gcc
+RUN cd /tmp && \
+        git clone https://github.com/cage-kiosk/cage.git --single-branch --branch v0.2.0 && \
+        cd cage && \
+        meson setup build && \
+        meson compile -C build
+
+RUN cd /tmp && \
+        git clone https://gitlab.freedesktop.org/emersion/wlr-randr.git --single-branch --branch v0.5.0 && \
+        cd wlr-randr && \
+        meson setup build && \
+	ninja -C build
+
 FROM quay.io/almalinuxorg/almalinux-bootc:10
+
+# Copy cage
+COPY --from=0 /tmp/cage/build/cage /usr/bin/cage
+COPY --from=0 /tmp/wlr-randr/build/wlr-randr /usr/bin/wlr-randr
 
 # Set kernel parameters
 COPY config/kernel-params.toml /usr/lib/bootc/kargs.d/00-kernel-params.toml
 
-# TEMP: Enable crb repo
-RUN sed -i '0,/^enabled=/s/^enabled=.*/enabled=1/' /etc/yum.repos.d/almalinux-crb.repo
+# Enable EPEL and CRB
+RUN dnf install --setopt=install_weak_deps=False -y epel-release && \
+	dnf install --setopt=install_weak_deps=False dnf-plugins-core -y && \
+	dnf config-manager --set-enabled crb
 
 # Install ITGMania dependencies and base system package
-RUN dnf install --setopt=install_weak_deps=False -y epel-release
-
 RUN dnf install --setopt=install_weak_deps=False -y \
 	mesa-libGLU libglvnd libglvnd-glx \
 	libogg libvorbis gtk3 libusb1 \
@@ -17,6 +38,7 @@ RUN dnf install --setopt=install_weak_deps=False -y \
 	cockpit cockpit-files cockpit-networkmanager \
 	cockpit-ostree cockpit-podman \
 	alsa-firmware alsa-utils alsa-lib \
+	wlroots bc \
 	sddm weston
 
 # Download and extract game
@@ -32,6 +54,8 @@ RUN curl https://github.com/itgmania/itgmania/releases/download/v1.1.0/ITGmania-
 
 # Copy launch-game script
 COPY --chmod=555 scripts/launch_game.sh /opt/game/launch_game.sh
+COPY --chmod=555 scripts/check_new_screen.sh /opt/game/check_new_screen.sh
+COPY --chmod=555 scripts/outputs_to_main_res.sh /opt/game/outputs_to_main_res.sh
 
 # Copy sddm config and session
 COPY config/sddm.conf /etc/sddm.conf.d/sddm.conf
