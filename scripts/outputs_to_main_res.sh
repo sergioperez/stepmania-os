@@ -21,8 +21,8 @@ mode=$(jq -r ".[] | select(.name == \"${main_output}\") | .modes[] | select(.cur
 if [[ -z "$mode" ]]; then
 	echo "Warning: output '${main_output}' not found in screens_json" >&2
 	echo "Un-plug the secondary monitors, leaving only the first one"
-	zenity --info --text "No main monitor found: Restart the system with a single monitor to set a main monitor." --timeout 4
-	exit 0
+	main_output=$(jq -r .[0].name <<< "${screens_json}")
+	zenity --info --text "No main monitor found: Restart the system with a single monitor to set a main monitor. Falling back to ${main_output}" --timeout 4
 fi
 
 width=$(jq -r .width <<< "${mode}")
