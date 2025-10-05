@@ -23,6 +23,7 @@ if [[ -z "$mode" ]]; then
 	echo "Un-plug the secondary monitors, leaving only the first one"
 	main_output=$(jq -r .[0].name <<< "${screens_json}")
 	zenity --info --text "No main monitor found: Restart the system with a single monitor to set a main monitor. Falling back to ${main_output}" --timeout 4
+	mode=$(jq -r ".[] | select(.name == \"${main_output}\") | .modes[] | select(.current)" <<< "${screens_json}")
 fi
 
 width=$(jq -r .width <<< "${mode}")
