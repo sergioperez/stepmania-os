@@ -18,7 +18,7 @@ do
         echo "Starting ITGMania"
         if [ -z "$DISPLAY" ]; then
 		# If a different monitor is detected, set the game to its resolution
-		cage -s -- bash -c "/opt/game/check_new_screen.sh && /opt/game/outputs_to_main_res.sh && /opt/game/itgmania/itgmania"
+		cage -m extend -s -- bash -c "/opt/game/check_new_screen.sh && /opt/game/outputs_to_main_res.sh && /opt/game/itgmania/itgmania"
         fi
         echo "Game stopped - Restarting"
 	sleep 2

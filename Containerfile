@@ -24,6 +24,9 @@ COPY --from=0 /tmp/wlr-randr/build/wlr-randr /usr/bin/wlr-randr
 # Set kernel parameters
 COPY config/kernel-params.toml /usr/lib/bootc/kargs.d/00-kernel-params.toml
 
+# Workaround to allow hotplugging a monitor
+COPY config/99-monitor-hotplug.rules /etc/udev/rules.d
+
 # Enable EPEL and CRB
 RUN dnf install --setopt=install_weak_deps=False -y epel-release && \
 	dnf install --setopt=install_weak_deps=False dnf-plugins-core -y && \
