@@ -16,8 +16,15 @@ screens_json="$(wlr-randr --json)"
 system_displays="$(jq -r ".[].name" <<< "${screens_json}")"
 
 main_output=$(cat "${MAIN_OUTPUT_FILE}")
-
 mode=$(jq -r ".[] | select(.name == \"${main_output}\") | .modes[] | select(.current)" <<< "${screens_json}")
+# If the main output is not found anymore
+if [[ -z "$mode" ]]; then
+	echo "Warning: output '${main_output}' not found in screens_json" >&2
+	echo "Un-plug the secondary monitors, leaving only the first one"
+	zenity --info --text "No main monitor found: Restart the system with a single monitor to set a main monitor." --timeout 4
+	exit 0
+fi
+
 width=$(jq -r .width <<< "${mode}")
 height=$(jq -r .height <<< "${mode}")
 refresh=$(jq -r .refresh <<< "${mode}")

@@ -41,8 +41,8 @@ RUN dnf install --setopt=install_weak_deps=False -y \
 	cockpit cockpit-files cockpit-networkmanager \
 	cockpit-ostree cockpit-podman \
 	alsa-firmware alsa-utils alsa-lib \
-	wlroots bc \
-	sddm weston
+	wlroots sddm weston \
+	bc zenity
 
 # Download and extract game
 RUN curl https://github.com/itgmania/itgmania/releases/download/v1.1.0/ITGmania-1.1.0-Linux-no-songs.tar.gz \
