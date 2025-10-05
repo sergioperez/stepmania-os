@@ -25,6 +25,7 @@ fi
 # Gather monitor info
 display_name=$(jq -r '.[0].name' <<< "${screens_json}")
 preferred_mode=$(jq -c ".[] | select(.name == \"${display_name}\") | .modes[] | select(.preferred)" <<< "${screens_json}")
+
 # If no default resolution -> Fallback to 640x480 
 if [[ -z "${preferred_mode}" ]]
 then

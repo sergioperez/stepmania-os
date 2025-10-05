@@ -4,6 +4,7 @@
 #
 SM_PREFS_FILE="${HOME}/.itgmania/Save/Preferences.ini"
 MAIN_OUTPUT_FILE="${HOME}/main_monitor"
+SCREEN_COUNT_FILE="${HOME}/screen_count"
 
 settings_interlaced="$(grep '^Interlaced=' "${SM_PREFS_FILE}" | cut -f2 -d'=' | grep -o '[0-1]')"
 if [[ "${settings_interlaced}" == 1 ]]
@@ -48,3 +49,7 @@ do
 		wlr-randr --output "${display}" --custom-mode="${width}x${height}"
 	fi
 done <<< "${system_displays}"
+
+# Keep track of how many outputs there are
+screen_count=$(jq -r '. | length' <<< "${screens_json}")
+echo "${screen_count}" >> "${SCREEN_COUNT_FILE}"

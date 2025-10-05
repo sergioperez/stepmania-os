@@ -59,6 +59,7 @@ RUN curl https://github.com/itgmania/itgmania/releases/download/v1.1.0/ITGmania-
 COPY --chmod=555 scripts/launch_game.sh /opt/game/launch_game.sh
 COPY --chmod=555 scripts/check_new_screen.sh /opt/game/check_new_screen.sh
 COPY --chmod=555 scripts/outputs_to_main_res.sh /opt/game/outputs_to_main_res.sh
+COPY --chmod=555 scripts/monitor_hotplug.sh /opt/game/monitor_hotplug.sh
 
 # Copy sddm config and session
 COPY config/sddm.conf /etc/sddm.conf.d/sddm.conf
