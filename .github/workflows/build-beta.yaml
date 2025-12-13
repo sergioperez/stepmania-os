@@ -28,6 +28,7 @@ jobs:
         with:
           image: os
           tags: "beta ${{ steps.tag.outputs.tag }}"
+          archs: amd64_v2
           labels: |
             org.opencontainers.image.version="${{ steps.tag.outputs.tag }}"
           containerfiles: |
