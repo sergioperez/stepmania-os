@@ -1,4 +1,4 @@
-FROM quay.io/fedora/fedora-bootc:43 as builder
+FROM quay.io/fedora/fedora-bootc:43
 
 # Set kernel parameters
 COPY config/kernel-params.toml /usr/lib/bootc/kargs.d/00-kernel-params.toml
