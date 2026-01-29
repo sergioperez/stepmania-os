@@ -1,4 +1,6 @@
 #!/usr/bin/bash
+
+# Raise volume
 cards=$(ls /proc/asound | grep '^card[0-9]\+$' | cut -d "d" -f2)
 for card in ${cards}
 do

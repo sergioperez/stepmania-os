@@ -1,2 +1,0 @@
-/usr/bin/set_vol.sh &
-nice -n 1 /opt/game/itgmania/itgmania
