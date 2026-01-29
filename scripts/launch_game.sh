@@ -11,3 +11,7 @@
 
 # Launch game
 /usr/sbin/cage /opt/game/itgmania/itgmania
+
+# If the game crashes, sleep 3s
+echo "Game crashed"
+sleep 3
