@@ -25,6 +25,7 @@ Type=simple
 ExecStart=/usr/sbin/cage /opt/game/launch_game.sh
 ExecStartPost=+sh -c "tty_name='%i'; exec chvt $${tty_name#tty}"
 Restart=always
+RestartSec=3
 User=stepmania
 # Log this user with utmp, letting it show up with commands 'w' and
 # 'who'. This is needed since we replace (a)getty.
