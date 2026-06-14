@@ -24,4 +24,4 @@ do
 done
 
 echo "Screen count: ${screen_count}"
-/opt/game/outputs_to_main_res.sh
+/opt/game/scripts/video/outputs_to_main_res.sh

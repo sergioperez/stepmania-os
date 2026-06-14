@@ -1,2 +1,2 @@
 # Dirty workaround to allow extra monitors/external capture devices
-SUBSYSTEM=="drm", ACTION=="change", RUN+="/usr/bin/sudo -u stepmania bash -c \"XDG_RUNTIME_DIR=/run/user/$(id -u) systemd-run --user -- /opt/game/monitor_hotplug.sh\""
+SUBSYSTEM=="drm", ACTION=="change", RUN+="/usr/bin/sudo -u stepmania bash -c \"XDG_RUNTIME_DIR=/run/user/$(id -u) systemd-run --user -- /opt/game/scripts/video/monitor_hotplug.sh\""

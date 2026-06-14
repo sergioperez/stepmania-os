@@ -1,0 +1,6 @@
+admin ALL=(stepmania) NOPASSWD: /usr/bin/cat
+admin ALL=(stepmania) NOPASSWD: /usr/bin/killall
+admin ALL=(stepmania) NOPASSWD: /usr/bin/sed
+admin ALL=(root) NOPASSWD: /usr/sbin/systemctl stop cage@tty1
+admin ALL=(root) NOPASSWD: /usr/sbin/systemctl start cage@tty1
+
