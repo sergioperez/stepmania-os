@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+GRACEFUL_EXIT_COMMAND="/usr/bin/poweroff"
 
 # Set volume to 100%
 /opt/game/raise_volume.sh
@@ -9,8 +10,8 @@
 # Set all the outputs to the resolution of the main screen
 /opt/game/outputs_to_main_res.sh
 
-# Launch game
-/usr/sbin/cage /opt/game/itgmania/itgmania
+# Launch game - Poweroff on graceful exit
+/usr/sbin/cage /opt/game/itgmania/itgmania && ${GRACEFUL_EXIT_COMMAND}
 
 # If the game crashes, sleep 3s
 echo "Game crashed"

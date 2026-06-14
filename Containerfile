@@ -20,14 +20,14 @@ RUN dnf install --setopt=install_weak_deps=False -y \
 	bc
 
 # Download and extract game
-RUN curl https://github.com/itgmania/itgmania/releases/download/v1.1.0/ITGmania-1.1.0-Linux-no-songs.tar.gz \
+RUN curl https://github.com/itgmania/itgmania/releases/download/v1.2.1/ITGmania-1.2.1-Linux-no-songs.tar.gz \
 		-Lo /opt/game.tar.gz && \
 	mkdir /opt/game && \
 	mv /opt/game.tar.gz /opt/game && \
 	cd /opt/game && \
 	tar zxvf /opt/game/game.tar.gz && \
 	rm /opt/game/game.tar.gz && \
-	mv /opt/game/ITGmania-1.1.0-Linux-no-songs/itgmania /opt/game && \
+	mv /opt/game/ITGmania-1.2.1-Linux-no-songs/itgmania /opt/game && \
 	rm -rf /opt/game/ITGmania-*
 
 # Copy launch-game script
